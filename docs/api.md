@@ -13,16 +13,16 @@ RootConfig {
 }
 ```
 
-## Spec
+## Configuration
 
 | item           | Example/Default                   | Remarks                                                   |
 | -------------- | --------------------------------- | --------------------------------------------------------- |
 | samples        | `[['input here', 'output here']]` | List of input/output string pairs                         |
 | prefix         | `blah blah blah`                  | Top-line prefix to "set the table" of the API interaction |
-| credential     | //                                | API Key                                                   |
+| credential     | xxxxxxxxxxxxxxxxxxxxxxxx          | API Key                                                   |
 | APIConfig?: {} | //                                | **[See below](#apiconfig)**                               |
 | APIFlags?: {}  | //                                | **[See below](#apiflags)**                                |
-| Transform      | //                                | **[See below](#transformer-function)**                    |
+| transform      | //                                | **[See below](#transformer-function)**                    |
 | inputString    | `input`                           | Label for samples in priming, defaults to "input"         |
 | outputString   | `output`                          | Label for samples in priming, defaults to "output"        |
 

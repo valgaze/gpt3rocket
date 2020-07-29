@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express"; // $ npm i express @types/express --save
-import { gpt3Endpoint } from "./../src/index";
+import { gpt3Endpoint } from "gpt3rocket";
 const port = process.env.port || 3000;
 const app = express();
 
