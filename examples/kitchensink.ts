@@ -1,4 +1,4 @@
-import { GPT3Rocket } from "./../src/index";
+import { GPT3Rocket } from "gpt3rocket";
 
 const config = {
   credential: "xxxxxxxxxxxxxxxxxxx",
