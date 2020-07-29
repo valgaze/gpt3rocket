@@ -1,0 +1,33 @@
+{
+  "name": "gpt3rocket",
+  "version": "0.5.0",
+  "description": "Little helper utility for priming + transacting w/ GPT3 api",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "dev": "nodemon",
+    "start": "npm run build",
+    "build": "tsc",
+    "killdist": "rm -rf dist/ 2>/dev/null",
+    "test": "npm run killdist && npm run build && node_modules/.bin/tape dist/tests/*.test.js",
+    "coverage": "istanbul cover node_modules/.bin/tape ./dist/tests/*.test.js",
+    "r": "ts-node $1"
+  },
+  "keywords": ["GPT3", "Conversation", "Chat", "Intelligent Agents"],
+  "author": "Victor Algaze",
+  "license": "MIT",
+  "devDependencies": {
+    "tape": "^5.0.1",
+    "tape-await": "^0.1.2",
+    "@types/tape": "^4.13.0",
+    "istanbul": "^0.4.5",
+    "nodemon": "^2.0.3",
+    "np": "^6.2.3",
+    "prettier": "^2.0.5",
+    "ts-node": "^8.8.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "axios": "^0.19.2"
+  }
+}

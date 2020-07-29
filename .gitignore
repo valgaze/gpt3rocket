@@ -1,0 +1,8 @@
+
+node_modules/
+dist/
+yarn.lock
+coverage/
+tests/service-account.json
+.DS_STORE
+.DS_Store
