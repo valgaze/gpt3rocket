@@ -65,8 +65,8 @@ export interface RootConfig {
  * const prefix = 'The following is an exchange between the user and an intelligent agent. The agent is friendly, prompt, and wants to help the
  * ```
  *
- ## Transformer (optional)
- * An optional transformer function to control how the prefix & samples are structured when sent to API
+ ## Transform (optional)
+ * An optional function to adjust how the prefix & samples are structured when sent to API
  *
  * Receives samples, prefix, inputString, outputString
  * Without a custom function, a template will look like the following
@@ -80,7 +80,7 @@ export interface RootConfig {
  *
  *
  * ```ts
- * const transformer = ({samples, prefix, inputString, outputString} => {
+ * const transform = ({samples, prefix, inputString, outputString} => {
  *  const decoratedSamples = samples.map((example, idx) => {
  *    if (!(idx % 2)) {
  *      return `${inputString}:${example}`;
@@ -164,13 +164,17 @@ export class GPT3Rocket {
 
   async ask(
     prompt: string,
-    samples: Samples = [],
-    prefix?: string,
+    samples: Samples = [
+      ["What are you?", "I am a helper agent here to answer your questions!"],
+    ],
+    prefix: string = "This is a conversation with a helpful agent. The agent is kind, clever and eager to help",
     APIFlags: APIFlags = {},
     APIConfig: APIConfig = {}
   ): Promise<any> {
-    let query = this.buildQuery(prompt, samples, prefix);
-
+    let query = prompt;
+    if (samples && samples.length) {
+      query = this.buildQuery(prompt, samples, prefix);
+    }
     const mergedAPIConfig = Object.assign(this.config.APIConfig, APIConfig);
     const mergedAPIFlags = Object.assign(this.config.APIFlags, APIFlags);
 
@@ -197,13 +201,12 @@ export class GPT3Rocket {
       });
 
     const { full_response } = mergedAPIConfig;
-
     if (full_response) {
       return result.data;
     } else {
       const res = result.data.choices[0].text || "";
-      const target = `${this.config.outputString}:`;
-      return res.replace(target, "");
+      const target = `${this.config.outputString}:`; // ex output:
+      return { text: res.replace(target, "") };
     }
   }
 
@@ -268,9 +271,14 @@ export class GPT3Rocket {
         return `${outputString}:${example}`;
       }
     });
-    return `${prefix}\n${decoratedSamples.join(
-      "\n"
-    )}\n${inputString}:${prompt}\n`;
+
+    if (prefix && decoratedSamples.length) {
+      return `${prefix}\n${decoratedSamples.join(
+        "\n"
+      )}\n${inputString}:${prompt}\n`;
+    } else {
+      return `${inputString}:${prompt}\n`;
+    }
   }
 }
 
@@ -280,6 +288,7 @@ export class GPT3Rocket {
  */
 export const gpt3Endpoint = (config: RootConfig) => {
   const inst = new GPT3Rocket(config);
+
   // TODO: req/res types, body-parser/no body-parser
   return async (req: any, res: any, next: any) => {
     const {
@@ -290,7 +299,6 @@ export const gpt3Endpoint = (config: RootConfig) => {
       prompt,
     } = req.body;
     const result = await inst.ask(prompt, samples, prefix, APIFlags, APIConfig);
-
     return res.status(200).send(result);
   };
 };

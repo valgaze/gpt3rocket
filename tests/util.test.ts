@@ -38,7 +38,7 @@ test("<inst.add, inst.addPrefix custom transformer", async (t: any) => {
 
 test("<inst.clear: inst.add, inst.addPrefix clear>", async (t: any) => {
   const prompt = "Who made you?";
-  const expected = "\n\ninput:Who made you?\n";
+  const expected = "input:Who made you?\n";
 
   inst.clear();
   const actual = inst.buildQuery(prompt);
@@ -64,7 +64,7 @@ test("<Prefix, samples set from config, baseline>", async (t: any) => {
 
 test("<Prefix, samples from config, clear>", async (t: any) => {
   const prompt = "Who made you?";
-  const expected = "\n\ninput:Who made you?\n";
+  const expected = "input:Who made you?\n";
 
   const samples = [["a", "b"]];
   const prefix = "This is a prefix";

@@ -10,13 +10,13 @@ tl:dr; Little helper to easily "prime" & interact w/ GPT3's API w/ sample exampl
 
 ---
 
-🚀 This is a little helper utlity designed mainly to explore conversational or "chat" interfaces with **[GPT3](https://github.com/openai/gpt-3)** but can also be useful for non conversational work.
+🚀 This is a little helper utlity designed mainly to explore conversational or "chat" interfaces with **[GPT3](https://github.com/openai/gpt-3)** but can also be useful for non conversational work uses.
 
 The big idea is to make it very simple to send to GPT3's API the following:
 
 - **"Priming statement"**: Natural language description of the task to be performed (or the background/mood of a conversational agent)
 
-- **Some samples:** GPT3 model does not need a lot of input/output pairs, but a few clues can help guide it to sucessfully complete our query.
+- **Some samples:** GPT3 model does not need a lot of input/output pairs, but a few clues or demonstrations of how the agent behaves can help guide it to sucessfully "complete" our query
 
 If you're interested in exploring GPT3's capabililties for conversational interfaces, a full "chat" interface; w/ various debugging tooling is available here too: **[https://github.com/valgaze/gpt3-chat](https://github.com/valgaze/gpt3-chat)**
 
