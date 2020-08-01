@@ -31,7 +31,7 @@ test("<Build Query, with no sample or prefix, default transform>", async (t: any
   const prompt = "Who made you?";
   const actual = inst.buildQuery(prompt);
 
-  const expected = "\n\ninput:Who made you?\n";
+  const expected = "input:Who made you?\n";
   t.deepEqual(actual, expected);
 });
 
