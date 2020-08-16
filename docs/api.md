@@ -25,6 +25,7 @@ RootConfig {
 | transform      | //                                | **[See below](#transformer-function)**                    |
 | inputString    | `input`                           | Label for samples in priming, defaults to "input"         |
 | outputString   | `output`                          | Label for samples in priming, defaults to "output"        |
+| debug          | `false`                           | Toggle for descriptive/debug logging                      |
 
 ## APIConfig
 
