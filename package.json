@@ -1,6 +1,6 @@
 {
   "name": "gpt3rocket",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Little helper utility for priming + transacting w/ GPT3 api",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
