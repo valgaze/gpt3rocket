@@ -15,7 +15,7 @@ export interface APIResponse {
 }
 
 export type Sample = string[][];
-export type Samples = string[][];
+export type Samples = [string, string] | [string, string][] | [] | string[][];
 
 export interface APIFlags {
   engine?: string; // The engine model id-- there 4 models, ada, babbage, curie, davinci)
@@ -44,6 +44,7 @@ export interface RootConfig {
   transform?: any;
   inputString?: string; // Label for samples, defaults to "input"
   outputString?: string; // Label for samples, defaults to "output"
+  debug?: boolean;
 }
 /**
  * ## Opts: Samples & prefix
@@ -110,11 +111,11 @@ export interface RootConfig {
  */
 export class GPT3Rocket {
   public config: RootConfig;
-
   constructor(configRef: RootConfig) {
+    //         ["What are you?", "I am a helper agent here to answer your questions!"],
     const defaults = {
       samples: [],
-      prefix: "",
+      prefix: `This is a conversation with a helpful agent. The agent is kind, clever and eager to help`,
       transform: this._transformer,
       inputString: "input",
       outputString: "output",
@@ -128,8 +129,17 @@ export class GPT3Rocket {
         temperature: 0.3,
         stop: "\n",
       },
+      debug: false,
     };
-    this.config = Object.assign(defaults, configRef);
+
+    const mergeAPIFlags = Object.assign(
+      defaults.APIFlags,
+      configRef.APIFlags || {}
+    );
+    this.config = Object.assign(defaults, configRef, {
+      APIFlags: mergeAPIFlags,
+    });
+    this.__debug("<gpt3-rocket> Root config:", this.config);
   }
 
   buildQuery(prompt: string, samples: Samples = [], prefix: string = "") {
@@ -164,21 +174,40 @@ export class GPT3Rocket {
 
   async ask(
     prompt: string,
-    samples: Samples = [
-      ["What are you?", "I am a helper agent here to answer your questions!"],
-    ],
-    prefix: string = "This is a conversation with a helpful agent. The agent is kind, clever and eager to help",
+    samples: Samples = [],
+    prefix: string = "",
     APIFlags: APIFlags = {},
     APIConfig: APIConfig = {}
   ): Promise<any> {
     let query = prompt;
     if (samples && samples.length) {
-      query = this.buildQuery(prompt, samples, prefix);
+      if (prefix) {
+        query = this.buildQuery(prompt, samples, prefix);
+      } else if (this.config.prefix) {
+        query = this.buildQuery(prompt, samples, this.config.prefix);
+      }
+    } else {
+      if (this.config.samples) {
+        query = this.buildQuery(
+          prompt,
+          this.config.samples,
+          this.config.prefix
+        );
+      } else {
+        query = this.buildQuery(
+          prompt,
+          this.config.samples,
+          this.config.prefix
+        );
+      }
     }
+    // Plaintext, config fallback case
     const mergedAPIConfig = Object.assign(this.config.APIConfig, APIConfig);
     const mergedAPIFlags = Object.assign(this.config.APIFlags, APIFlags);
 
+    this.__debug("<gpt3-rocket> Query: ", query);
     const endpoint = mergedAPIConfig.endpoint;
+    let error: boolean | any = false;
     const result = await axios
       .post(
         endpoint as string,
@@ -194,19 +223,34 @@ export class GPT3Rocket {
         }
       )
       .catch((e) => {
-        if (e.response && e.response.status === 401) {
+        this.__debug("<gpt3-rocket> ERROR:", e.response);
+        if (e.response && e.response.status === 401 && e.response.data) {
           console.log(`\n\n<YOUR CREDENTIAL IS LIKELY INVALID>\n\n`);
+          if (e.response.data.error) {
+            error = e.response.data.error;
+          }
         }
-        throw new Error(e);
       });
 
     const { full_response } = mergedAPIConfig;
-    if (full_response) {
-      return result.data;
+
+    if (!error) {
+      if (full_response && result) {
+        return result.data;
+      } else if (result) {
+        const res = result.data.choices[0].text || "";
+        const target = `${this.config.outputString}:`; // ex output:
+        return { text: res.replace(target, "") };
+      }
     } else {
-      const res = result.data.choices[0].text || "";
-      const target = `${this.config.outputString}:`; // ex output:
-      return { text: res.replace(target, "") };
+      if (full_response) {
+        return error;
+      } else {
+        return {
+          text:
+            error.message || "There was a problem (your key might be invalid)",
+        };
+      }
     }
   }
 
@@ -214,6 +258,7 @@ export class GPT3Rocket {
     if (sample.length > 2 || sample.length < 2 || !Array.isArray(sample)) {
       throw new Error("Sample should be exactly one input & one output");
     }
+    //@ts-ignorex
     this?.config?.samples?.push(sample);
   }
 
@@ -254,6 +299,12 @@ export class GPT3Rocket {
 
   updateCredential(credential: string) {
     this.config.credential = credential;
+  }
+
+  __debug(...payload: any) {
+    if (this.config.debug) {
+      console.log.apply(console, payload);
+    }
   }
 
   _transformer(
